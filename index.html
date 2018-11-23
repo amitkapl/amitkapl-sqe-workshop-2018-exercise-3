@@ -20,43 +20,57 @@
             }
         </style>
     </head>
-    <body>
-        <table>
-            <tr>
-                <td>
-                    <div>
-                        <label>Enter code here</label>
-                    </div>
-                </td>
-                <td>
-                    <div>
-                        <label>Parsed code here</label>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <div class="textAreaWrapper">
-                        <textarea id="codePlaceholder" title="Enter code here"></textarea>
-                    </div>
-                </td>
-                <td>
-                    <div class="textAreaWrapper">
-                        <textarea id="parsedCode" title="Parse code"></textarea>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <div>
-                        <button id="codeSubmissionButton">Parse code</button>
-                    </div>
-                </td>
-                <td>
-                </td>
-            </tr>
-        </table>
+    <table>
+        <tr>
+            <td>
+                <div>
+                    <label>Enter code here</label>
+                </div>
+            </td>
+            <td>
+                <div>
+                    <label>Parsed code here</label>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="textAreaWrapper">
+                    <textarea id="codePlaceholder" title="Enter code here"></textarea>
+                </div>
+            </td>
+            <td>
+                <div class="textAreaWrapper">
+                    <textarea id="parsedCode" title="Parse code"></textarea>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div>
+                    <button id="codeSubmissionButton">Parse code</button>
+                </div>
+            </td>
+            <td>
+            </td>
+        </tr>
+    </table>
 
-        <script src="dist/bundle.js"></script>
-    </body>
+    <table>
+        <tr>
+            <td>
+                <div>
+                    <table class="my">
+                        <thead id = "headData">
+                        </thead>
+                        <tbody id = "showData">
+                        </tbody>
+                    </>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <script src="dist/bundle.js"></script>
+    <link href="style.css" rel="stylesheet" type="text/css">
 </html>
