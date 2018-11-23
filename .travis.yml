@@ -13,5 +13,5 @@ script:
 notifications:
   email:
     recipients:
-      - amka@post.bgu.ac.il
+      - kaplan.amit@gmail.com
     on_failure: always
