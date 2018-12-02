@@ -7,7 +7,8 @@ let typeToHandlerMapping = {
     'WhileStatement': parseWhileStatement,
     'IfStatement': (json, lst) => parseIfStatement(json, lst, ''),
     'ReturnStatement': parseReturnStatement,
-    'ForStatement': parseForStatement
+    'ForStatement': parseForStatement,
+    'EmptyStatement': (json, lst) => lst
 };
 
 let expressionTypeToHandlerMapping = {
@@ -79,11 +80,26 @@ function parseReturnStatement(json, lst) {
     return lst;
 }
 
+function parseVariableDeclarationInFor(json) {
+    var toReturn = '';
+    json.declarations.forEach((v) => toReturn = toReturn.concat(v.id.name, '=', parseExpressionGetValue(v.init), ';'));
+    return toReturn;
+}
+
+function parseForInitStatement(json){
+    switch (json.type){
+    case 'AssignmentExpression':
+        return parseExpressionGetValue(json).concat(';');
+    case 'VariableDeclaration':
+        return parseVariableDeclarationInFor(json);
+    }
+}
+
 function parseForStatement(json, lst) {
-    var init = parseExpressionGetValue(json.init);
+    var init = parseForInitStatement(json.init);
     var test = parseExpressionGetValue(json.test);
     var update = parseExpressionGetValue(json.update);
-    lst.push({line: json.loc.start.line, type: 'for statement', condition: init.concat(';', test, ';', update)});
+    lst.push({line: json.loc.start.line, type: 'for statement', condition: init.concat(test, ';', update)});
     lst = parseOneOfTheList(json.body, lst);
     return lst;
 }
