@@ -7,8 +7,7 @@ let typeToHandlerMapping = {
     'WhileStatement': parseWhileStatement,
     'IfStatement': (json, lst) => parseIfStatement(json, lst, ''),
     'ReturnStatement': parseReturnStatement,
-    'ForStatement': parseForStatement,
-    'EmptyStatement': (json, lst) => lst
+    'ForStatement': parseForStatement
 };
 
 let expressionTypeToHandlerMapping = {
@@ -47,7 +46,8 @@ function parseExpressionStatement(json, lst) {
     switch (exp.type){
     case 'AssignmentExpression':
         var val = parseExpressionGetValue(exp.right);
-        lst.push({line: json.loc.start.line, type: 'assignment expression', name: exp.left.name, value: val});
+        var name = parseExpressionGetValue(exp.left);
+        lst.push({line: json.loc.start.line, type: 'assignment expression', name: name, value: val});
         break;
     }
     return lst;

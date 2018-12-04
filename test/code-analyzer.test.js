@@ -156,4 +156,30 @@ describe('The javascript parser', () => {
                 '{"line":14,"type":"return statement","value":"-1"}' +
             ']');
     });
+
+    it('is parsing a Tirguls example to list', () => {
+        check('function Sort(arr){\n' +
+            '   for(let i =0;i<arr.length - 1 ; i++){\n' +
+            '      for(let j =0;j<arr.length - (1+1) ; j++){\n' +
+            '         if (arr[j]>arr[j+1]){\n' +
+            '             let temp = arr[j];\n' +
+            '             arr[j]=arr[j+1];\n' +
+            '             arr[j+1]=temp;\n' +
+            '          }\n' +
+            '       }\n' +
+            '   }\n' +
+            '   return arr;\n' +
+            '}',
+            '[' +
+            '{"line":1,"type":"function declaration","name":"Sort"},' +
+            '{"line":1,"type":"variable declaration","name":"arr"},' +
+            '{"line":2,"type":"for statement","condition":"i=0;i < arr[length] - 1;i++"},' +
+            '{"line":3,"type":"for statement","condition":"j=0;j < arr[length] - 1 + 1;j++"},' +
+            '{"line":4,"type":"if statement","condition":"arr[j] > arr[j + 1]"},' +
+            '{"line":5,"type":"variable declaration","name":"temp","value":"arr[j]"},' +
+            '{"line":6,"type":"assignment expression","name":"arr[j]","value":"arr[j + 1]"},' +
+            '{"line":7,"type":"assignment expression","name":"arr[j + 1]","value":"temp"},' +
+            '{"line":11,"type":"return statement","value":"arr"}' +
+            ']');
+    });
 });
