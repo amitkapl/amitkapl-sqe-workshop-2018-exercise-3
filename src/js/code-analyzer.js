@@ -1,7 +1,6 @@
 import * as esprima from 'esprima';
 import * as escodegen from 'escodegen';
 import * as Assignment1 from './ass1';
-// var safeEval = require('safe-eval');
 const parseCode = (codeToParse) => {
     return esprima.parseScript(codeToParse);
 };
@@ -58,11 +57,6 @@ function substituteBinaryExpression(json, env, isInFunction) {
     return [json, env];
 }
 
-// function substituteUnaryExpression(json, env, isInFunction) {
-//     json.argument = typeHandle(json.argument, env, isInFunction)[0];
-//     return [json, env];
-// }
-
 function substituteAssignmentExpression(json, env, isInFunction) {
     json.right = typeHandle(json.right,env, isInFunction)[0];
     let temp = extendEnv(env, json.left, json.right);
@@ -83,14 +77,10 @@ function substituteVariableDeclaration(json, env, isInFunction) {
             env.push({isLocal: true, variable: variable, value: value});
         else
             env.push({variable: variable, value: value});
-        // temp = extendEnv(env, json.declarations[i].id, json.declarations[i].init)[1];
-        // env = temp[1];
     }
-    // if(temp[0] === true)
     if(isInFunction === true)
         return [false, env];
     return [json, env];
-    // return [env, json];
 }
 
 function changeGlobalEnv(globalEnv, localEnv) {
@@ -182,8 +172,6 @@ function substitute(json, env, isInFunction) {
             newBody.push(temp[0]);
         myEnv = temp[1];
     }
-    // if(newBody.length === 0 && json.body.length > 0)
-    //     newBody.push(temp[2]);
     json.body = newBody;
     return [json, env];
 }
