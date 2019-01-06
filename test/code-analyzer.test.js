@@ -1,172 +1,82 @@
-/* eslint-disable max-lines-per-function,indent */
 import assert from 'assert';
-import {parseCode, substitute, paintCode} from '../src/js/code-analyzer';
+import {makeAGraph} from '../src/js/code-analyzer';
 
 function check(code,input,expectedResult){
-    let parsedCode = parseCode(code);
-    let substituteCode = substitute(parsedCode, [], false)[0];
-    let actualResult = paintCode(substituteCode, input);
+    let actualResult = makeAGraph(code, input);
     assert.equal(actualResult, expectedResult);
 }
-// eslint-disable-next-line max-lines-per-function
+
+
 
 describe('The javascript parser', () => {
-    it('is substituting an empty function correctly', () => {
-        check('','', '');
+    it('Empty function without arguments', () => {
+        check('function test1(){}','','digraph cfg { forcelabels=true }');
     });
 
-    it('is substituting a simple variable declaration correctly', () => {
-        check(
-            'let a = 1;',
-            '',
-            'let a = 1;<br>\n'
-            );
+    it('Empty function with one argument', () => {
+        check('function test2(x){}','','digraph cfg { forcelabels=true }');
     });
 
-    it('is substituting first example correctly', () => {
-        check(
-            'function foo(x, y, z){\n' +
-            'let a = x + 1;\n' +
-            'let b = a + y;\n' +
-            'let c = 0;\n' +
-            '\n' +
-            'if (b < z) {\n' +
-            'c = c + 5;\n' +
-            'return x + y + z + c;\n' +
-            '} else if (b < z * 2) {\n' +
-            'c = c + x + 5;\n' +
-            'return x + y + z + c;\n' +
-            '} else {\n' +
-            'c = c + z + 5;\n' +
-            'return x + y + z + c;\n' +
-            '}\n' +
-            '}\n',
-            '{"x":"1","y":"2","z":"3"}',
-            'function foo(x, y, z) {<br>\n' +
-            '<mark class="red">    if (1 + 1 + 2 < 3) {</mark><br>\n' +
-            '        return 1 + 2 + 3 + (0 + 5);<br>\n' +
-            '<mark class="green">    } else if (1 + 1 + 2 < 3 * 2) {</mark><br>\n' +
-            '        return 1 + 2 + 3 + (0 + 1 + 5);<br>\n' +
-            '    } else {<br>\n' +
-            '        return 1 + 2 + 3 + (0 + 3 + 5);<br>\n' +
-            '    }<br>\n' +
-            '}<br>\n'
-        );
+    it('Empty function with one argument and input', () => {
+        check('function test3(x){}','{"x":"1"}','digraph cfg { forcelabels=true }');
     });
 
-    it('is substituting second example correctly', () => {
+    it('function one argument', () => {
         check(
-            'function foo(x, y, z){\n' +
-            '    let a = x + 1;\n' +
-            '    let b = a + y;\n' +
-            '    let c = 0;\n' +
-            '    \n' +
-            '    while (a < z) {\n' +
-            '        c = a + b;\n' +
-            '        z = c * 2;\n' +
-            '    }\n' +
-            '    \n' +
-            '    return z;\n' +
-            '}\n',
-            '',
-            'function foo(x, y, z) {<br>\n' +
-            '    while (x + 1 < z) {<br>\n' +
-            '        z = (x + 1 + (x + 1 + y)) * 2;<br>\n' +
-            '    }<br>\n' +
-            '    return z;<br>\n' +
-            '}<br>\n'
-        );
-    });
-
-    it('is substituting global correctly', () => {
-        check(
-            'let m = 2;' +
-            'function f(x){' +
-            '   x = m + x;' +
-            '   return 3;' +
-            '}',
-            '{"x":"3"}',
-            'let m = 2;<br>\n' +
-            'function f(x) {<br>\n' +
-            '    x = 2 + 3;<br>\n' +
-            '    return 3;<br>\n' +
-            '}<br>\n'
-        );
-    });
-
-    it('is substituting same global and param correctly', () => {
-        check(
-            'let m = 2;' +
-            'function f(m){' +
-            '   m = m + 2;' +
-            '   return m;' +
+            'function test4(x){\n' +
+            '    let y = 1;\n' +
+            '    return y;' +
             '}',
             '',
-            'let m = 2;<br>\n' +
-            'function f(m) {<br>\n' +
-            '    m = m + 2;<br>\n' +
-            '    return m + 2;<br>\n' +
-            '}<br>\n'
-        );
+            'digraph cfg { forcelabels=true n0[label="-1-\nlet y = 1;",  shape=rectangle,]\nn1[label="-2-\nreturn y;",  shape=rectangle,]\nn0 -> n1 []\n}');
     });
 
-    it('is substituting same global and use of it in function correctly', () => {
+    it('function with one argument and input', () => {
         check(
-            'let m = 2;' +
-            'function f(){' +
-            '   m = m + 2;' +
-            '   return m + 2;' +
+            'function test4(x){\n' +
+            '    let y = 1;\n' +
+            '    return y;' +
             '}',
-            '',
-            'let m = 2;<br>\n' +
-            'function f() {<br>\n' +
-            '    m = 2 + 2;<br>\n' +
-            '    return 2 + 2 + 2;<br>\n' +
-            '}<br>\n'
+            '{"x":"1"}',
+            'digraph cfg { forcelabels=true n0[label="-1-\nlet y = 1;",  shape=rectangle, style = filled, fillcolor = green]\nn1[label="-2-\nreturn y;",  shape=rectang' +
+            'le, style = filled, fillcolor = green]\nn0 -> n1 []\n}'
         );
     });
 
-    it('is substituting a simple variable declaration and assignment expression correctly', () => {
+    it('First example without input', () => {
         check(
-            'let a = 1;' +
-            'a = 2;',
+            'function foo(x, y, z){\n    let a = x + 1;\n    let b = a + y;\n    let c = 0;\n    \n    if (b < z) {\n        c = c + 5;\n    } else if (b < z * 2) {\n        c = c + x + 5;\n    } else {\n        c = c + z + 5;\n    }\n    \n    return c;\n}',
             '',
-            'let a = 1;<br>\n' +
-            'a = 2;<br>\n'
+            'digraph cfg { forcelabels=true n0[label="-1-\nlet a = x + 1;",  shape=rectangle,]\nn1[label="-2-\nlet b = a + y;",  shape=rectangle,]\nn2[label="-3-\nlet c = 0;",  shape=rectangle,]\nn3[label="-4-\nb < z",  shape=diamond,]\nn4[label="-5-\nc = c + 5",  shape=rectangle,]\nn5[label="-6-\nreturn c;",  shape=rectangle,]\nn6[label="-7-\nb < z * 2",  shape=diamond,]\nn7[label="-8-\nc = c + x + 5",  shape=rectangle,]\nn8[label="-9-\nc = c + z + 5",  shape=rectangle,]\nn0 -> n1 []\nn1 -> n2 []\nn2 -> n3 []\nn3 -> n4 [label="T"]\nn3 -> n6 [label="F"]\nn4 -> n5 []\nn6 -> n7 [label="T"]\nn6 -> n8 [label="F"]\nn7 -> n5 []\nn8 -> n5 []\n}'
         );
     });
 
-    it('is substituting another simple variable declaration correctly', () => {
+    it('First example with input', () => {
         check(
-            'let b = 2;' +
-            'a = b + 1;',
-            '',
-            'let b = 2;<br>\n' +
-            'a = 2 + 1;<br>\n'
-        );
-    });
-
-    it('is substituting a simple if statement correctly', () => {
-        check(
-            'if (1 < 2){' +
-            '   let b = 2;' +
+            'function foo(x, y, z){\n    let a = x + 1;\n    let b = a + y;\n    let c = 0;\n    \n    if (b < z) {\n        c = c + 5;\n    } else if (b < z * 2) {\n        c = c + x + 5;\n    } else {\n        c = c + z + 5;\n    }\n    \n    return c;\n}',
+            '{' +
+            '"x":"1",' +
+            '"y":"2",' +
+            '"z":"3"' +
             '}',
-            '',
-            '<mark class="green">if (1 < 2) {</mark><br>\n' +
-            '    let b = 2;<br>\n' +
-            '}<br>\n'
+            'digraph cfg { forcelabels=true n0[label="-1-\nlet a = x + 1;",  shape=rectangle, style = filled, fillcolor = green]\nn1[label="-2-\nlet b = a + y;",  shape=rectangle, style = filled, fillcolor = green]\nn2[label="-3-\nlet c = 0;",  shape=rectangle, style = filled, fillcolor = green]\nn3[label="-4-\nb < z",  shape=diamond, style = filled, fillcolor = green]\nn4[label="-5-\nc = c + 5",  shape=rectangle,]\nn5[label="-6-\nreturn c;",  shape=rectangle, style = filled, fillcolor = green]\nn6[label="-7-\nb < z * 2",  shape=diamond, style = filled, fillcolor = green]\nn7[label="-8-\nc = c + x + 5",  shape=rectangle, style = filled, fillcolor = green]\nn8[label="-9-\nc = c + z + 5",  shape=rectangle,]\nn0 -> n1 []\nn1 -> n2 []\nn2 -> n3 []\nn3 -> n4 [label="T"]\nn3 -> n6 [label="F"]\nn4 -> n5 []\nn6 -> n7 [label="T"]\nn6 -> n8 [label="F"]\nn7 -> n5 []\nn8 -> n5 []\n}'
         );
     });
 
-    it('is substituting another simple if statement correctly', () => {
+    it('Second example without input', () => {
         check(
-            'if (2 < 1){' +
-            '   let b = 2;' +
-            '}',
+            'function foo(x, y, z){\n   let a = x + 1;\n   let b = a + y;\n   let c = 0;\n   \n   while (a < z) {\n       c = a + b;\n       z = c * 2;\n       a++;\n   }\n   \n   return z;\n}',
             '',
-            '<mark class="red">if (2 < 1) {</mark><br>\n' +
-            '    let b = 2;<br>\n' +
-            '}<br>\n'
+            'digraph cfg { forcelabels=true n0[label="-1-\nlet a = x + 1;",  shape=rectangle,]\nn1[label="-2-\nlet b = a + y;",  shape=rectangle,]\nn2[label="-3-\nlet c = 0;",  shape=rectangle,]\nn3[label="-4-\na < z",  shape=diamond,]\nn4[label="-5-\nc = a + b",  shape=rectangle,]\nn5[label="-6-\nz = c * 2",  shape=rectangle,]\nn6[label="-7-\na++",  shape=rectangle,]\nn7[label="-8-\nreturn z;",  shape=rectangle,]\nn0 -> n1 []\nn1 -> n2 []\nn2 -> n3 []\nn3 -> n4 [label="T"]\nn3 -> n7 [label="F"]\nn4 -> n5 []\nn5 -> n6 []\nn6 -> n3 []\n}'
         );
     });
+
+    it('Empty function with two argument', () => {
+        check('function test2(x,y){}','','digraph cfg { forcelabels=true }');
+    });
+
+    it('Empty function with two argument and input', () => {
+        check('function test2(x,y){}','{"x":"1","y":"1"}','digraph cfg { forcelabels=true }');
+    });
+
 });
