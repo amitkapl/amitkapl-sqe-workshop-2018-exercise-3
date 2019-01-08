@@ -16,6 +16,15 @@ const typeToHandlerMapping = {
     'VariableDeclaration': varDecl,
     // 'LogicalExpression': (json, env) => eval(evalCodeAndChangeEnv(json.left, env) + json.operator + evalCodeAndChangeEnv(json.right, env)),
     'MemberExpression': getValueFromEnv,
+    'UpdateExpression': (json, env) => {
+        let left  = revertParseCode(json.argument);
+        let right = json.argument.name;
+        if (json.operator === '++')
+            right += '+1';
+        else
+            right += '-1';
+        return editEnv(left,evalCodeAndChangeEnv(parseCode(right).body[0].expression , env), env);
+    }
 };
 
 

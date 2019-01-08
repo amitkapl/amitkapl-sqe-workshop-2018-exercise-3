@@ -79,4 +79,12 @@ describe('The javascript parser', () => {
         check('function test2(x,y){}','{"x":"1","y":"1"}','digraph cfg { forcelabels=true }');
     });
 
+    it('UpdateExpression ++', () => {
+        check('function test2(x){x++;}','{"x":"1"}','digraph cfg { forcelabels=true n0[label="-1-\nx++",  shape=rectangle, style = filled, fillcolor = green]\nn0 -> n-1 []\n}');
+    });
+
+    it('UpdateExpression --', () => {
+        check('function test2(x){x--;}','{"x":"1"}','digraph cfg { forcelabels=true n0[label="-1-\nx--",  shape=rectangle, style = filled, fillcolor = green]\nn0 -> n-1 []\n}');
+    });
+
 });
